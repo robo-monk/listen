@@ -1,7 +1,52 @@
 import subprocess
 import whisper
 
+import re
+
+def undo(text):
+    sentences = text.split(".")
+    i = 0
+    filtered_sentences = []
+
+    while i < len(sentences):
+        sentence = sentences[i]
+        words = sentence.split()
+        filtered_words = []
+
+        ii = 0
+        while ii < len(words):
+            word = words[ii]
+            filtered_words.append(word)
+
+            if word != "undo":
+                ii += 1
+                continue
+
+            next_word = words[ii + 1]
+
+            if next_word == "sentence":
+                filtered_sentences.pop()
+                filtered_words = []
+                break
+            else:
+                filtered_words.pop() # pop the undo
+                if len(filtered_words) > 0:
+                    filtered_words.pop() # pop the undoed word
+
+            ii += 1
+
+
+        if len(filtered_words) > 0:
+            filtered_sentences.append(" ".join(filtered_words))
+
+        i += 1                
+
+    return ". ".join(filtered_sentences)
+
+
+
 def copy(t):
+    t = t.replace("'", "\'")
     subprocess.run(f"echo '{t}' | pbcopy", shell=True)
 
 def stream_record():
@@ -11,6 +56,11 @@ def consume_result(result):
     text = result["text"]
     print("\n[LISTEN] Here's what you said:\n")
     print(text)
+
+    print("\n[LISTEN] Here's the processed version:\n")
+    text = undo(text)
+    print(text)
+
     copy(text)
     print("\n[LISTEN] copied to clipboard -")
 
