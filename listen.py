@@ -57,12 +57,12 @@ def consume_result(result):
     print("\n[LISTEN] Here's what you said:\n")
     print(text)
 
-    print("\n[LISTEN] Here's the processed version:\n")
+    print("\n[LISTEN] Here's the processed version:\n ")
     text = undo(text)
     print(text)
 
     copy(text)
-    print("\n[LISTEN] copied to clipboard -")
+    print("\n[LISTEN] copied to clipboard")
 
 print("[LISTEN] Speak. Press [q] when you're done")
 print("[LISTEN] Loading model...")
