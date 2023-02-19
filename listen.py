@@ -1,7 +1,9 @@
 import subprocess
 import whisper
-
 import re
+import tempfile
+
+fd, path =tempfile.mkstemp(suffix = '.mp3')
 
 def undo(text):
     sentences = text.split(".")
@@ -43,14 +45,12 @@ def undo(text):
 
     return ". ".join(filtered_sentences)
 
-
-
 def copy(t):
     t = t.replace('"', "\"")
     subprocess.run(f'echo "{t}" | pbcopy', shell=True)
 
 def stream_record():
-    subprocess.run("ffmpeg -loglevel info -f avfoundation -i ':0' -sample_rate 48000 -b:a 320k output.mp3 -y", shell=True);   
+    subprocess.run(f"time ffmpeg -loglevel info -f avfoundation -i ':0' -sample_rate 48000 -b:a 320k {path} -y", shell=True);   
 
 def consume_result(result):
     text = result["text"]
@@ -68,9 +68,12 @@ print("[LISTEN] Speak. Press [q] when you're done")
 print("[LISTEN] Loading model...")
 model = whisper.load_model("base")
 
-print("[LISTEN] Init recorder...")
+print(f"[LISTEN] Init recorder. Will temporary save recording to {path}")
 stream_record()
 
 print("[LISTEN] Transcribing...")
-result = model.transcribe("output.mp3")
+result = model.transcribe(path)
 consume_result(result)
+
+print(f"[LISTEN] Done. Purging {path}")
+subprocess.run(f'rm "{path}"', shell=True)
