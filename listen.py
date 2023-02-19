@@ -1,16 +1,25 @@
 import subprocess
-import ffmpeg 
 import whisper
 
+def copy(t):
+    subprocess.run(f"echo '{t}' | pbcopy", shell=True)
 
 def stream_record():
-    subprocess.run("ffmpeg -f avfoundation -i ':0' output.mp3 -y", shell=True);   
+    subprocess.run("ffmpeg -loglevel info -f avfoundation -i ':0' -sample_rate 48000 -b:a 320k output.mp3 -y", shell=True);   
 
-print("-> Loading model...")
+def consume_result(result):
+    text = result["text"]
+    print("\n[LISTEN] Here's what you said:\n")
+    print(text)
+    copy(text)
+    print("\n[LISTEN] copied to clipboard -")
+
+print("-> [LISTEN] Loading model...")
 model = whisper.load_model("base")
-print("-> Done loading model...")
 
+print("-> [LISTEN] Init recorder...")
 stream_record()
 
+print("-> [LISTEN] Transcribing...")
 result = model.transcribe("output.mp3")
-print(result["text"])
+consume_result(result)
