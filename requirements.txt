@@ -1,0 +1,8 @@
+numpy
+torch
+tqdm
+more-itertools
+whisper
+transformers>=4.19.0
+ffmpeg-python==0.2.0
+# git+https://github.com/openai/whisper.git 
